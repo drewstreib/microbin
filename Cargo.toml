@@ -52,7 +52,7 @@ syntect = { version = "5.2.0", default-features = false }
 webpki-roots = { version = "0.26", optional = true }
 
 [dependencies.openssl]
-version = "0.10.64"
+version = "0.10.72"
 features = ["vendored"]
 optional = true
 

@@ -7,8 +7,23 @@ RUN \
   apt-get update &&\
   apt-get -y install ca-certificates tzdata
 
-COPY . .
+# Copy only dependency files first for better layer caching
+COPY Cargo.toml Cargo.lock ./
 
+# Create a dummy main.rs to build dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+
+# Build dependencies (this layer will be cached if Cargo.toml doesn't change)
+RUN \
+  CARGO_NET_GIT_FETCH_WITH_CLI=true \
+  cargo build --release && \
+  rm -rf src target/release/deps/microbin*
+
+# Copy source code
+COPY src ./src
+COPY templates ./templates
+
+# Build the actual application
 RUN \
   CARGO_NET_GIT_FETCH_WITH_CLI=true \
   cargo build --release
